@@ -40,9 +40,9 @@ export default class App extends React.Component {
     console.log('clicked', index);
     const completedTask = this.state.toDoList[index];
     completedTask.complete = true;
-    // You will need to check that you do not add the same task twice
     this.setState({
       completedTaskList: [...this.state.completedTaskList, completedTask],
+      toDoList: this.state.toDoList.filter((item, i) => i !== index),
     });
   }
 
