@@ -1,12 +1,12 @@
 import React from "react";
-// import data from "./data.json";
+import data from "./data.json";
 export default class App extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      task: "",
+      value: "",
       id: 0,
-      toDoList: [],
+      toDoList: {},
       completedTaskList: [],
       complete: false,
     };
@@ -16,39 +16,37 @@ export default class App extends React.Component {
   }
 
   handleChange(e) {
-    this.setState({ task: e.target.value });
+    this.setState({ value: e.target.value });
   }
 
   handleSubmit(e) {
     e.preventDefault();
-    if (this.state.task.length > 0) {
+    if (this.state.value.length > 0) {
       this.setState({
         toDoList: [
           ...this.state.toDoList,
           {
             id: this.state.toDoList.length + 1,
-            task: this.state.task,
+            value: this.state.value,
             complete: false,
           },
         ],
       });
-      console.log(this.state.toDoList);
     }
   }
 
   handleClick() {
-    console.log("clicked");
     this.setState((prevState) => ({
-      complete: !prevState.complete,
+      isToggleOn: !prevState.isToggleOn,
     }));
   }
 
   ArrayList(props) {
     const items = props.toDoList;
-    const listItems = Object.keys(items).map((item) => (
-      <div className={items[item].complete ? "strike" : ""}>
+    const listItems = items.map((item) => (
+      <div>
         <input type="checkbox" />
-        {items[item].task}
+        {item}
       </div>
     ));
     return listItems;
@@ -61,15 +59,14 @@ export default class App extends React.Component {
         <form onSubmit={this.handleSubmit}>
           <input
             type="text"
-            task={this.state.task}
+            value={this.state.value}
             onChange={this.handleChange}
           ></input>
-          <input type="submit" task="Submit"></input>
+          <input type="submit" value="Submit"></input>
         </form>
         <h2>Ongoing list</h2>
         <this.ArrayList toDoList={this.state.toDoList} />
-
-        {/* <h2>Completed List</h2> */}
+        <h2>Completed List</h2>
       </div>
     );
   }
