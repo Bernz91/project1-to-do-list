@@ -47,7 +47,7 @@ export default class App extends React.Component {
     const items = props.toDoList;
     const listItems = Object.keys(items).map((item) => (
       <div className={items[item].complete ? "strike" : ""}>
-        <input type="checkbox" />
+        <input onClick={this.handleClick} type="checkbox" />
         {items[item].task}
       </div>
     ));
