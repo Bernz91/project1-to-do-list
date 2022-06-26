@@ -91,21 +91,19 @@ export default class App extends React.Component {
 
   handleKeyPress(list, index, e) {
     if (e.key === "Enter") {
-      let isEditingList = list;
-      isEditingList[index].isEditing = true;
+      // let isEditingList = list;
+      list[index].isEditing = true;
       this.setState({
-        list: isEditingList,
+        list: list,
       });
     }
   }
 
-  editTask(list, index, e) {
-    console.log(e);
+  editTask(list, index, e, event) {
+    console.log(event);
     let editedList = list;
     editedList[index].task = e;
-    this.setState({
-      toDoList: editedList,
-    });
+    console.log(list);
   }
 
   render() {
@@ -126,7 +124,7 @@ export default class App extends React.Component {
           handleClick={this.handleClick}
           setIsEditing={this.setIsEditing}
           editTask={this.editTask}
-          handleKeyPress={this.handleKeyPress}
+          // handleKeyPress={this.handleKeyPress}
         />
         <h2>Completed list</h2>
         <ToDoListDisplayed
@@ -134,7 +132,7 @@ export default class App extends React.Component {
           handleClick={this.handleClick}
           setIsEditing={this.setIsEditing}
           editTask={this.editTask}
-          handleKeyPress={this.handleKeyPress}
+          // handleKeyPress={this.handleKeyPress}
         />
         {/* <h2>Completed List</h2>
         {this.state.completedTaskList.map((item, index) => (
