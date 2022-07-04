@@ -1,10 +1,13 @@
 body {
-  margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
+  /* margin: 0; */
+  /* font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
     "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
-    sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+    sans-serif; */
+  font-family: "Roboto", sans-serif;
+  /* -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale; */
+  background-color: #228b22;
+  color: red;
 }
 
 code {
@@ -12,10 +15,96 @@ code {
     monospace;
 }
 
-.checkbox {
-  display: inline-block;
+.header {
+  font-family: "Roboto", sans-serif;
+  font-size: 100px;
+  font-weight: bold;
+  display: flex;
+  justify-content: center;
 }
 
-.strike {
-  text-decoration: line-through;
+.task-forms {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  align-self: center;
+  text-align: center;
+  align-content: center;
+}
+
+.form-group {
+  width: 60vw;
+  margin: 0;
+  padding: 5px 10px;
+}
+
+.card {
+  font-size: 24px;
+}
+
+.list-group-item.active,
+.list-group-item.active:hover,
+.list-group-item.active:focus {
+  z-index: 2;
+  color: #ffffff;
+  background-color: black;
+  border-color: black;
+  /* height: 55px; */
+  display: flex;
+  align-self: center;
+  align-content: center;
+  align-items: center;
+  justify-content: space-between;
+  text-align: center;
+}
+
+.list-group-item {
+  display: flex;
+  align-self: center;
+  align-content: center;
+  align-items: center;
+  justify-content: space-between;
+  text-align: center;
+  margin: 0;
+  padding: 0px;
+}
+
+ul {
+  padding: 0;
+  margin: 0;
+}
+
+/* .list-group-item {
+  height: 45px;
+  padding: 0;
+  margin: 0;
+} */
+
+[contenteditable] {
+  outline: 0px solid transparent;
+}
+
+[contentEditable="true"]:empty:not(:focus):before {
+  content: attr(data-text);
+}
+
+.todo {
+  display: flex;
+  flex-direction: column;
+  /* align-items: center;
+  align-self: center; */
+  /* justify-content: left; */
+  text-align: left;
+  font-size: 18px;
+  padding: 0;
+  margin: 0;
+}
+
+.task {
+  font-size: 18px;
+}
+
+.description {
+  font-size: 12px;
+  max-width: 70vw;
 }
