@@ -1,6 +1,6 @@
 import React, { useRef } from "react";
-import ToDoListDisplayed from "./ToDoListDisplayed";
-import { Button, Card, Form } from "react-bootstrap";
+import ToDisplayTask from "./toDisplayTask";
+import ToDisplayListNames from "./toDisplayListNames";
 import "bootstrap/dist/css/bootstrap.min.css";
 
 // import data from "./data.json";
@@ -8,127 +8,101 @@ export default class App extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
+      id: 0,
       task: "",
       description: "",
-      toDoList: [
+      newList: "",
+      listNames: [
         {
-          id: 0,
-          task: "-",
-          complete: false,
-          isEditing: false,
-          mouseEnter: false,
+          name: "Outstanding List",
+          headerMouseEnter: false,
+          headerClick: false,
+        },
+        {
+          name: "Completed List",
+          headerMouseEnter: false,
+          headerClick: false,
         },
       ],
-      completedTaskList: [
-        {
-          id: 0,
-          task: "-",
-          complete: false,
-          isEditing: false,
-          mouseEnter: false,
-        },
-      ],
+      tasksList: {
+        array0: [
+          {
+            id: 1,
+            task: "Project 1",
+            description: "fix some bugs and CSS",
+            listId: "array0",
+            complete: false,
+            isEditing: false,
+            mouseEnter: false,
+          },
+          {
+            id: 2,
+            task: "Buy groceries",
+            description: "Milk, honey, sugar, tea, coffee, hotpot ingredients",
+            listId: "array0",
+            complete: false,
+            isEditing: false,
+            mouseEnter: false,
+          },
+          {
+            id: 3,
+            task: "Throw a party!!",
+            description: "Finally project 1 is done. Time to celebrate!",
+            listId: "array0",
+            complete: false,
+            isEditing: false,
+            mouseEnter: false,
+          },
+          {
+            id: 4,
+            task: "Go for a run",
+            description: "",
+            listId: "array0",
+            complete: false,
+            isEditing: false,
+            mouseEnter: false,
+          },
+        ],
+
+        array1: [
+          {
+            id: 0,
+            task: "-",
+            complete: false,
+            isEditing: false,
+            mouseEnter: false,
+          },
+        ],
+      },
+
+      selectedList: [],
+      listIndexClicked: 0,
+      listClicked: "array0",
       dragItem: useRef,
       dragOverItem: useRef,
-      collapseOutstanding: true,
-      collapseCompleted: true,
       completedDate: "",
     };
     this.handleChangeTask = this.handleChangeTask.bind(this);
     this.handleChangeDescription = this.handleChangeDescription.bind(this);
-    this.handleSubmit = this.handleSubmit.bind(this);
-    this.handleClick = this.handleClick.bind(this);
+    this.handleTaskSubmit = this.handleTaskSubmit.bind(this);
+    this.handleChangeList = this.handleChangeList.bind(this);
+    // this.handleNewListSubmit = this.handleNewListSubmit.bind(this);
+    this.handleCheck = this.handleCheck.bind(this);
     this.removeToDo = this.removeToDo.bind(this);
-    this.handleDoubleClick = this.handleDoubleClick.bind(this);
+    this.handleEditClick = this.handleEditClick.bind(this);
     this.editTask = this.editTask.bind(this);
     this.editDescription = this.editDescription.bind(this);
     this.dragStart = this.dragStart.bind(this);
     this.dragEnter = this.dragEnter.bind(this);
     this.drop = this.drop.bind(this);
     this.handleKeyPress = this.handleKeyPress.bind(this);
-    this.handleOutstandingHeaderClick =
-      this.handleOutstandingHeaderClick.bind(this);
-    this.handleCompletedHeaderClick =
-      this.handleCompletedHeaderClick.bind(this);
     this.handleMouseEnter = this.handleMouseEnter.bind(this);
     this.handleMouseLeave = this.handleMouseLeave.bind(this);
+    this.handleListNamesClick = this.handleListNamesClick.bind(this);
+    this.handleHeaderMouseEnter = this.handleHeaderMouseEnter.bind(this);
+    this.handleHeaderMouseLeave = this.handleHeaderMouseLeave.bind(this);
   }
-
-  componentDidUpdate() {
-    if (this.state.toDoList.length === 0) {
-      this.setState({
-        collapseOutstanding: true,
-        toDoList: [
-          {
-            id: 0,
-            task: "-",
-            complete: false,
-            isEditing: false,
-            mouseEnter: false,
-          },
-        ],
-      });
-    }
-
-    if (this.state.completedTaskList.length === 0) {
-      this.setState({
-        collapseCompleted: true,
-        completedTaskList: [
-          {
-            id: 0,
-            task: "-",
-            complete: false,
-            isEditing: false,
-            mouseEnter: false,
-          },
-        ],
-      });
-    }
-  }
-
-  handleSubmit(e) {
-    e.preventDefault();
-    if (this.state.toDoList[0].id === 0) {
-      let outstanding = [
-        {
-          id: 1,
-          task: this.state.task,
-          description: this.state.description,
-          complete: false,
-          isEditing: false,
-          mouseEnter: false,
-        },
-      ];
-      this.setState({
-        task: "",
-        description: "",
-        toDoList: outstanding,
-        collapseOutstanding: false,
-      });
-    } else if (this.state.task.length > 0) {
-      let outstanding = [...this.state.toDoList];
-      outstanding = [
-        ...outstanding,
-        {
-          id:
-            this.state.toDoList.length +
-            this.state.completedTaskList.length +
-            1,
-          task: this.state.task,
-          description: this.state.description,
-          complete: false,
-          isEditing: false,
-          mouseEnter: false,
-        },
-      ];
-      this.setState({
-        task: "",
-        description: "",
-        toDoList: outstanding,
-        collapseOutstanding: false,
-      });
-    } else alert("Please input a task");
-  }
+  // ~~~~~~~~~~~~~~~~~~~~ task forms handlers ~~~~~~~~~~~~~~~~~~~~
 
   handleChangeTask(e) {
     this.setState({
@@ -142,56 +116,184 @@ export default class App extends React.Component {
     });
   }
 
-  handleClick(list, index) {
-    console.log("clicked", index);
-    let selectedTask = list[index];
-    selectedTask.complete = selectedTask.complete ? false : true;
-    selectedTask.mouseEnter = false;
-    // let copy = list;
-    // copy[index].complete = copy[index].complete ? false : true;
-
-    // this.setState({
-    //   toDoList: copy,
-    // });
-
-    if (selectedTask.complete) {
-      var tempCompletedTaskList =
-        this.state.completedTaskList[0].id === 0
-          ? [selectedTask]
-          : [...this.state.completedTaskList, selectedTask];
-      var filteredToDoList = this.state.toDoList.filter((task) => {
-        return !task.complete;
+  handleTaskSubmit(e) {
+    e.preventDefault();
+    let idCopy = this.state.id + 1;
+    if (this.state.tasksList.array0[0].id === 0) {
+      let outstanding = [
+        {
+          id: idCopy,
+          task: this.state.task,
+          description: this.state.description,
+          listId: "array0",
+          complete: false,
+          isEditing: false,
+          mouseEnter: false,
+        },
+      ];
+      let copy = this.state.tasksList;
+      copy.array0 = outstanding;
+      this.setState({
+        task: "",
+        description: "",
+        id: idCopy,
+        tasksList: copy,
+        listClicked: "array0",
+        listIndexClicked: 0,
+        // collapseOutstanding: false,
       });
-    } else if (!selectedTask.complete) {
-      var tempToDoList =
-        this.state.toDoList[0].id === 0
-          ? [selectedTask]
-          : [...this.state.toDoList, selectedTask];
-      var filteredCompletedList = this.state.completedTaskList.filter(
-        (task) => {
-          return task.complete;
-        }
-      );
+    } else if (this.state.task.length > 0) {
+      let copy = this.state.tasksList;
+      let outstandingList = copy.array0;
+
+      outstandingList = [
+        ...outstandingList,
+        {
+          id: idCopy,
+          task: this.state.task,
+          description: this.state.description,
+          listId: "array0",
+          complete: false,
+          isEditing: false,
+          mouseEnter: false,
+        },
+      ];
+      copy.array0 = outstandingList;
+      this.setState({
+        id: idCopy,
+        task: "",
+        description: "",
+        tasksList: copy,
+        listClicked: "array0",
+        listIndexClicked: 0,
+        // collapseOutstanding: false,
+      });
+    } else alert("Please input a task");
+  }
+
+  // ~~~~~~~~~~~~~~~~~~~~ Component Did Update ~~~~~~~~~~~~~~~~~~~~
+  componentDidUpdate() {
+    for (let i = 0; i < Object.keys(this.state.tasksList).length; i++) {
+      if (this.state.tasksList[`array${i}`].length === 0) {
+        let copy = this.state.tasksList;
+        let emptyTask = [
+          {
+            id: 0,
+            task: "-",
+            complete: false,
+            isEditing: false,
+            mouseEnter: false,
+          },
+        ];
+
+        copy[`array${i}`] = emptyTask;
+        console.log(copy);
+        this.setState({
+          tasksList: copy,
+        });
+      }
     }
+  }
+
+  // ~~~~~~~~~~~~~~~~~~~~ Headers handler ~~~~~~~~~~~~~~~~~~~~
+
+  handleListNamesClick(index) {
+    let selectedList = "array" + index;
+    let copy = this.state.listNames;
+    copy[index].headerClick = true;
+    this.setState({
+      listIndexClicked: index,
+      listClicked: selectedList,
+      listNames: copy,
+    });
+  }
+
+  handleHeaderMouseEnter(index) {
+    let copy = this.state.listNames;
+    copy[index].headerMouseEnter = true;
+    this.setState({
+      listNames: copy,
+    });
+  }
+  handleHeaderMouseLeave(index) {
+    let copy = this.state.listNames;
+    copy[index].headerMouseEnter = false;
+    this.setState({
+      listNames: copy,
+    });
+  }
+
+  // ~~~~~~~~~~~~~~~~~~~~ Headers Form handler ~~~~~~~~~~~~~~~~~~~~
+
+  handleChangeList(e) {
+    this.setState({
+      newList: e.target.value,
+    });
+  }
+
+  // handleNewListSubmit(e) {
+  //   e.preventDefault();
+  //   let copyListNames = [...this.state.listNames, this.state.newList];
+  //   let newArrayName = "array" + Object.keys(this.state.tasksList).length - 1;
+  //   // let emptyArray =  [newArrayName]: [] ;
+
+  //   let obj = {};
+  //   obj[newArrayName] = [];
+  //   let copyTasksList = this.state.tasksList;
+  //   copyTasksList.push(obj);
+  //   this.setState({
+  //     listNames: copyListNames,
+  //     tasksList: copyTasksList,
+  //   });
+  // }
+
+  // ~~~~~~~~~~~~~~~~~~~~ Tasks handlers ~~~~~~~~~~~~~~~~~~~~
+
+  // to mark a task has been completed / not
+  handleCheck(index) {
+    console.log("clicked", index);
+    let selectedTask = this.state.tasksList[this.state.listClicked][index];
+    console.log(selectedTask.complete);
+    selectedTask.complete = selectedTask.complete ? false : true;
+    console.log(selectedTask.mouseEnter);
+    selectedTask.mouseEnter = false;
+    selectedTask.isEditing = false;
+    console.log(selectedTask.isEditing);
+
+    let copy = this.state.tasksList;
+    let listWithRemovedTask = copy[this.state.listClicked].filter((task) => {
+      return this.state.listClicked === "array1"
+        ? task.complete
+        : !task.complete;
+    });
+    let listForAddedTask = selectedTask.complete
+      ? "array1"
+      : selectedTask.listId;
+    let listWithAddedTask =
+      this.state.tasksList[listForAddedTask][0].id === 0
+        ? [selectedTask]
+        : [...this.state.tasksList[listForAddedTask], selectedTask];
+    copy[this.state.listClicked] = listWithRemovedTask;
+    copy[listForAddedTask] = listWithAddedTask;
+
+    console.log(this.state.tasksList);
 
     // setTimeout(() => {
     this.setState({
-      toDoList: selectedTask.complete ? filteredToDoList : tempToDoList,
-      completedTaskList: selectedTask.complete
-        ? tempCompletedTaskList
-        : filteredCompletedList,
+      tasksList: copy,
+      // }, 2000);
     });
-    // }, 2000);
   }
 
-  removeToDo(list, index) {
-    let copyList = list;
-    copyList.splice(index, 1);
+  // removing a task from a list
+  removeToDo(index) {
+    let copy = this.state.tasksList;
+    copy[this.state.listClicked].splice(index, 1);
     this.setState({
-      list: copyList,
+      tasksList: copy,
     });
   }
-
+  // ------- dragging tasks -------
   dragStart(e, position) {
     this.setState({
       dragItem: position,
@@ -208,36 +310,47 @@ export default class App extends React.Component {
 
   drop(e) {
     e.preventDefault();
-    const copyListItems = [...this.state.toDoList];
-    const dragItemContent = copyListItems[this.state.dragItem];
+    let copy = this.state.tasksList;
+    let dragItemContent = copy[this.state.listClicked][this.state.dragItem];
     console.log(this.state.dragItem);
     console.log(this.state.dragOverItem);
-    copyListItems.splice(this.state.dragItem, 1);
-    copyListItems.splice(this.state.dragOverItem, 0, dragItemContent);
+    copy[this.state.listClicked].splice(this.state.dragItem, 1);
+    copy[this.state.listClicked].splice(
+      this.state.dragOverItem,
+      0,
+      dragItemContent
+    );
     this.setState({
       dragItem: null,
       dragOverItem: null,
-      toDoList: copyListItems,
+      tasksList: copy,
     });
   }
-
-  handleDoubleClick(list, index, e) {
+  // ------- editing tasks -------
+  handleEditClick(list, index, e) {
     e.preventDefault();
     console.log("double clicked");
-    let isEditingList = list;
-    isEditingList[index].isEditing = true;
-    this.setState({
-      list: isEditingList,
-    });
+    if (list[index].complete === false) {
+      let isEditingList = list;
+      isEditingList[index].isEditing = true;
+      // let copy = this.state.tasksList;
+      // copy[this.state.listClicked] = isEditingList;
+      this.setState({
+        list: isEditingList,
+      });
+    }
   }
 
   handleKeyPress(list, index, e) {
     console.log(e.charCode);
+    console.log(list);
     if (e.charCode === 13) {
-      let copy = list;
-      copy[index].isEditing = false;
+      let copyList = list;
+      copyList[index].isEditing = false;
+      // let copy = this.state.tasksList;
+      // copy[this.state.listClicked] = copyList;
       this.setState({
-        toDoList: list,
+        list: copyList,
       });
     }
   }
@@ -251,26 +364,8 @@ export default class App extends React.Component {
     let editedList = list;
     editedList[index].description = e;
   }
-  handleOutstandingHeaderClick() {
-    const copy = this.state.collapseOutstanding;
-    let state = copy ? false : true;
-    this.setState({
-      collapseOutstanding: state,
-      collapseCompleted: true,
-    });
-    console.log(this.state.collapseOutstanding);
-  }
 
-  handleCompletedHeaderClick() {
-    const copy = this.state.collapseCompleted;
-    let state = copy ? false : true;
-    this.setState({
-      collapseCompleted: state,
-      collapseOutstanding: true,
-    });
-    console.log(this.state.collapseOutstanding);
-  }
-
+  // ------- handling mouse events -------
   handleMouseEnter(list, index) {
     console.log("mouse here");
     let copy = list;
@@ -294,14 +389,14 @@ export default class App extends React.Component {
 
   render() {
     return (
-      <div>
+      <div className="h-100vh">
         <div className="header">
           <header>To-Do-List</header>
         </div>
 
         <form
-          className="task-forms d-flex align-items-end"
-          onSubmit={this.handleSubmit}
+          className="task-forms d-flex align-items-end h-20vh"
+          onSubmit={this.handleTaskSubmit}
         >
           <div class="d-flex flex-column">
             <div class="form-group">
@@ -328,65 +423,67 @@ export default class App extends React.Component {
           <input
             class="btn btn-secondary m-2"
             type="submit"
-            task="Submit"
+            value="Submit"
           ></input>
         </form>
+        <div class="container-fluid">
+          <div class="row">
+            <div class="col-2">
+              <div className="name-list">
+                <ToDisplayListNames
+                  nameList={this.state.listNames}
+                  handleListNamesClick={this.handleListNamesClick}
+                  handleHeaderMouseEnter={this.handleHeaderMouseEnter}
+                  handleHeaderMouseLeave={this.handleHeaderMouseLeave}
+                />
+              </div>
 
-        <div class="col-3">
-          <Card
-            data-toggle="collapseOutstanding"
-            href="#to_do_collapse"
-            role="button"
-            // aria-expanded={this.state.collapseOutstanding ? false : true}
-            onClick={this.handleOutstandingHeaderClick}
-          >
-            Outstanding list
-          </Card>
-          <ToDoListDisplayed
-            list={this.state.toDoList}
-            handleClick={this.handleClick}
-            handleDoubleClick={this.handleDoubleClick}
-            editTask={this.editTask}
-            editDescription={this.editDescription}
-            dragStart={this.dragStart}
-            dragEnter={this.dragEnter}
-            drop={this.drop}
-            handleKeyPress={this.handleKeyPress}
-            removeTodo={this.removeToDo}
-            heading={this.state.collapseOutstanding}
-            handleMouseEnter={this.handleMouseEnter}
-            handleMouseLeave={this.handleMouseLeave}
-          />
-        </div>
-        <div>
-          <div
-            className="card"
-            data-toggle="collapseOutstanding"
-            href="#completed_collapse"
-            role="button"
-            onClick={this.handleCompletedHeaderClick}
-          >
-            Completed list
+              {/* <div>
+                <form
+                  className="task-forms"
+                  onSubmit={this.handleNewListSubmit}
+                >
+                  <div className="form-group">
+                    <input
+                      class="form-control"
+                      type="text"
+                      value={this.state.newList}
+                      onChange={this.handleChangeList}
+                      placeholder="Enter a new list..."
+                    ></input>
+                  </div>
+
+                  <input
+                    class="btn btn-secondary m-2"
+                    type="submit"
+                    value="Submit"
+                  ></input>
+                </form>
+              </div> */}
+            </div>
+            <div class="col-10">
+              <div className="tasks-body">
+                <h1>
+                  {this.state.listNames[this.state.listIndexClicked].name}
+                </h1>
+                <ToDisplayTask
+                  list={this.state.tasksList[this.state.listClicked]}
+                  handleCheck={this.handleCheck}
+                  removeTodo={this.removeToDo}
+                  handleEditClick={this.handleEditClick}
+                  editTask={this.editTask}
+                  editDescription={this.editDescription}
+                  handleKeyPress={this.handleKeyPress}
+                  dragStart={this.dragStart}
+                  dragEnter={this.dragEnter}
+                  drop={this.drop}
+                  handleMouseEnter={this.handleMouseEnter}
+                  handleMouseLeave={this.handleMouseLeave}
+                />
+              </div>
+            </div>
           </div>
-          <ToDoListDisplayed
-            list={this.state.completedTaskList}
-            handleClick={this.handleClick}
-            handleDoubleClick={this.handleDoubleClick}
-            editTask={this.editTask}
-            handleKeyPress={this.handleKeyPress}
-            removeTodo={this.removeToDo}
-            heading={this.state.collapseCompleted}
-            handleMouseEnter={this.handleMouseEnter}
-            handleMouseLeave={this.handleMouseLeave}
-          />
         </div>
-        {/* <h2>Completed List</h2>
-        {this.state.completedTaskList.map((item, index) => (
-          <div key={index} className={item.complete ? "strike" : ""}>
-            <input readOnly type="checkbox" checked />
-            {item.task}
-          </div>
-        ))} */}
       </div>
     );
   }

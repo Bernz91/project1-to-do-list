@@ -1,11 +1,11 @@
 import React from "react";
-import { Button, Card } from "react-bootstrap";
+import { Button } from "react-bootstrap";
 
-const ToDoListDisplayed = ({
+const ToDisplayTask = ({
   list,
-  handleClick,
+  handleCheck,
   handleKeyPress,
-  handleDoubleClick,
+  handleEditClick,
   editTask,
   editDescription,
   dragStart,
@@ -22,8 +22,9 @@ const ToDoListDisplayed = ({
         return (
           <div
             key={index}
-            class={heading ? "collapse" : "collapse show"}
-            id={item.complete ? "completed_collapse" : "to_do_collapse"}
+
+            // class={heading ? "collapse" : "collapse show"}
+            // id={item.complete ? "completed_collapse" : "to_do_collapse"}
           >
             <div
               class={
@@ -36,17 +37,26 @@ const ToDoListDisplayed = ({
               onDragEnter={(e) => dragEnter(e, index)}
               onDragOver={(e) => e.preventDefault()}
               onDragEnd={drop}
-              onKeyPress={(e) => handleKeyPress(list, index, e)}
-              onMouseOver={() => handleMouseEnter(list, index)}
+              onMouseEnter={() => handleMouseEnter(list, index)}
               onMouseLeave={() => handleMouseLeave(list, index)}
-              onClick={(e) => handleDoubleClick(list, index, e)}
             >
               <div
                 className="todo"
                 style={{ textDecoration: item.complete ? "line-through" : "" }}
+                onKeyPress={(e) => handleKeyPress(list, index, e)}
+                onClick={(e) => handleEditClick(list, index, e)}
               >
                 <div
-                  contentEditable={item.isEditing ? "true" : "false"}
+                  className={
+                    item.mouseEnter && item.id !== 0
+                      ? "tasks-selected"
+                      : "tasks"
+                  }
+                  contentEditable={
+                    item.isEditing && !item.complete && item.id !== 0
+                      ? "true"
+                      : "false"
+                  }
                   onInput={(e) =>
                     editTask(list, index, e.currentTarget.textContent)
                   }
@@ -55,7 +65,11 @@ const ToDoListDisplayed = ({
                 </div>
                 <div
                   class={item.isEditing ? "description" : "d-none"}
-                  contentEditable={item.isEditing ? "true" : "false"}
+                  contentEditable={
+                    item.isEditing && !item.complete && item.id !== 0
+                      ? "true"
+                      : "false"
+                  }
                   onInput={(e) =>
                     editDescription(list, index, e.currentTarget.textContent)
                   }
@@ -70,13 +84,13 @@ const ToDoListDisplayed = ({
                   variant={
                     item.complete ? "outline-warning" : "outline-success"
                   }
-                  onClick={() => handleClick(list, index)}
+                  onClick={() => handleCheck(index)}
                 >
                   {item.complete && item.id !== 0 ? "Undone" : "Done"}
                 </Button>{" "}
                 <Button
                   variant="outline-danger"
-                  onClick={() => removeTodo(list, index)}
+                  onClick={() => removeTodo(index)}
                 >
                   ✕
                 </Button>
@@ -89,4 +103,4 @@ const ToDoListDisplayed = ({
   );
 };
 
-export default ToDoListDisplayed;
+export default ToDisplayTask;
